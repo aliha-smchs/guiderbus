@@ -1,0 +1,231 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand gradient: violet -> purple -> fuchsia */
+  --color-brand-from: #7c3aed;
+  --color-brand-via: #9333ea;
+  --color-brand-to: #d946ef;
+
+  /* Surfaces */
+  --color-base: #0a0a0f;
+  --color-surface: #13131a;
+  --color-surface-2: #1a1a23;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif,
+    system-ui, sans-serif;
+
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.25rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Lenis smooth scroll (class is added to <html> at runtime) */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--color-base);
+    color: #e4e4e7; /* zinc-200 */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgba(168, 85, 247, 0.35);
+    color: #fff;
+  }
+
+  /* Subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-base);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a35;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a48;
+  }
+}
+
+@layer utilities {
+  /* Gradient text */
+  .text-gradient {
+    background-image: linear-gradient(
+      120deg,
+      var(--color-brand-from),
+      var(--color-brand-via),
+      var(--color-brand-to)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      var(--color-brand-from),
+      var(--color-brand-via),
+      var(--color-brand-to)
+    );
+  }
+
+  /* Faint dot grid for section backgrounds */
+  .bg-grid {
+    background-image: radial-gradient(
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    );
+    background-size: 28px 28px;
+  }
+
+  /* Radial glow used behind the hero */
+  .glow-radial {
+    background:
+      radial-gradient(
+        50% 50% at 50% 0%,
+        rgba(147, 51, 234, 0.22) 0%,
+        rgba(147, 51, 234, 0) 100%
+      ),
+      radial-gradient(
+        40% 40% at 80% 20%,
+        rgba(217, 70, 239, 0.16) 0%,
+        rgba(217, 70, 239, 0) 100%
+      );
+  }
+
+  .border-subtle {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Scroll-reveal animation */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float-slow {
+    animation: float-slow 6s ease-in-out infinite;
+  }
+
+  /* Marquee — list is duplicated, so -50% creates a seamless loop */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 38s linear infinite;
+  }
+  .animate-marquee-reverse {
+    animation: marquee 44s linear infinite reverse;
+  }
+
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
+  }
+}
+
+/* Readable styling for legal document bodies */
+.legal-prose ul {
+  list-style: none;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.legal-prose li {
+  position: relative;
+  padding-left: 1.25rem;
+}
+.legal-prose li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  height: 5px;
+  width: 5px;
+  border-radius: 9999px;
+  background-color: #d946ef;
+}
+.legal-prose strong {
+  color: #e4e4e7;
+  font-weight: 600;
+}
+.legal-prose a {
+  color: #e879f9;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.legal-prose a:hover {
+  color: #f0abfc;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
