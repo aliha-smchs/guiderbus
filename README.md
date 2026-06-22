@@ -67,15 +67,82 @@ docker run --rm -p 3000:3000 guiderbus:latest
 # → http://localhost:3000
 ```
 
-Or with Compose (includes a healthcheck and restart policy):
+Or with Compose behind a shared Traefik proxy:
 
 ```bash
+cp .env.example .env
+docker network inspect traefik-proxy >/dev/null 2>&1 || docker network create traefik-proxy
 docker compose up --build -d
 docker compose logs -f
 docker compose down
 ```
 
-The container listens on `PORT` (default `3000`) and binds `HOSTNAME=0.0.0.0`, so it runs as-is on any container host — Cloud Run, ECS/Fargate, Fly.io, Railway, Kubernetes, a plain VPS, etc.
+The standalone app container listens on `PORT` (default `3000`) and binds `HOSTNAME=0.0.0.0`, so it can still run directly on any container host. The Compose setup is intended for a VPS with one shared Traefik instance and one Nginx container per app:
+
+- `web` runs the Next.js standalone server on the private `guiderbus-app` network
+- `nginx` proxies to `web:3000`
+- Traefik routes public traffic to the `nginx` container over the external Traefik network
+
+Set these values in `.env` on the VPS:
+
+```bash
+APP_DOMAIN=guiderbus.com
+TRAEFIK_NETWORK=traefik-proxy
+TRAEFIK_ENTRYPOINT=websecure
+TRAEFIK_CERT_RESOLVER=letsencrypt
+```
+
+`TRAEFIK_NETWORK` must match the Docker network used by your shared Traefik container.
+
+### GitHub Actions to VPS
+
+The workflow in `.github/workflows/ci-cd.yml` runs on pushes to `main`:
+
+1. Installs dependencies with `npm ci`
+2. Runs TypeScript checks with `npm run typecheck`
+3. Builds the Next.js app with `npm run build`
+4. SSHs into the VPS, pulls the latest `main`, and restarts the Docker Compose service
+
+Add these repository secrets in GitHub under **Settings > Secrets and variables > Actions**:
+
+| Secret | Value |
+| --- | --- |
+| `VPS_HOST` | VPS IP address or hostname |
+| `VPS_USER` | Linux user that owns the cloned repo |
+| `VPS_SSH_PRIVATE_KEY` | Private SSH key GitHub Actions uses to connect to the VPS |
+| `VPS_APP_DIR` | Absolute path to this repo on the VPS, for example `/home/deploy/guiderbus` |
+| `VPS_PORT` | SSH port, optional if it is `22` |
+
+Create a dedicated SSH key for GitHub Actions and authorize it for your VPS user:
+
+```bash
+ssh-keygen -t ed25519 -C "github-actions-guiderbus" -f github-actions-guiderbus -N ""
+ssh-copy-id -i github-actions-guiderbus.pub <your-vps-user>@<your-vps-host>
+```
+
+Use the contents of `github-actions-guiderbus` as the `VPS_SSH_PRIVATE_KEY` secret.
+
+One-time VPS requirements:
+
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin
+sudo usermod -aG docker <your-vps-user>
+```
+
+Log out and back in after adding the user to the `docker` group. Then verify the cloned repo can pull from GitHub and run Docker:
+
+```bash
+cd /path/to/guiderbus
+cp .env.example .env
+# edit .env if your Traefik network, entrypoint, cert resolver, or domain differs
+docker network inspect traefik-proxy >/dev/null 2>&1 || docker network create traefik-proxy
+git pull --ff-only origin main
+docker compose up --build -d
+docker compose ps
+```
+
+For private GitHub repos, make sure the VPS clone uses an SSH remote or another credential that can pull from the repository.
 
 Publish to a registry:
 

@@ -1,0 +1,106 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Build and Typecheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.ref == 'refs/heads/main'
+
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+      VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
+      VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+
+    steps:
+      - name: Validate deployment secrets
+        run: |
+          test -n "$VPS_HOST"
+          test -n "$VPS_USER"
+          test -n "$VPS_PORT"
+          test -n "$VPS_APP_DIR"
+          test -n "$VPS_SSH_PRIVATE_KEY"
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$VPS_PORT" "$VPS_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
+            "APP_DIR='$VPS_APP_DIR' bash -s" <<'EOF'
+          set -euo pipefail
+
+          cd "$APP_DIR"
+
+          git fetch --prune origin
+          git checkout main
+          git pull --ff-only origin main
+
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
+
+          set -a
+          . ./.env
+          set +a
+
+          compose() {
+            if docker compose version >/dev/null 2>&1; then
+              docker compose "$@"
+            elif command -v docker-compose >/dev/null 2>&1; then
+              docker-compose "$@"
+            else
+              echo "Docker Compose is not installed." >&2
+              exit 1
+            fi
+          }
+
+          docker network inspect "${TRAEFIK_NETWORK:-traefik-proxy}" >/dev/null 2>&1 || {
+            echo "Docker network '${TRAEFIK_NETWORK:-traefik-proxy}' does not exist. Create it before deploying this app." >&2
+            exit 1
+          }
+
+          compose up --build -d --remove-orphans
+          compose ps
+          docker image prune -f
+          EOF

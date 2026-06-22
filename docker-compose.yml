@@ -4,14 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     image: guiderbus:latest
-    container_name: guiderbus
+    container_name: guiderbus-web
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
+    networks:
+      - app
     healthcheck:
       test:
         [
@@ -24,3 +24,46 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: guiderbus-nginx
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - app
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-traefik-proxy}"
+      - "traefik.http.routers.guiderbus.rule=Host(`${APP_DOMAIN:-guiderbus.com}`)"
+      - "traefik.http.routers.guiderbus.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.guiderbus.tls=true"
+      - "traefik.http.routers.guiderbus.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}"
+      - "traefik.http.services.guiderbus.loadbalancer.server.port=80"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1/health",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  app:
+    name: guiderbus-app
+    internal: true
+  traefik:
+    name: ${TRAEFIK_NETWORK:-traefik-proxy}
+    external: true
