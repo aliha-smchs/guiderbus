@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { services } from "@/lib/services";
 import { site } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { GradientText } from "@/components/ui/GradientText";
 import { ServiceIcon } from "@/components/ui/ServiceIcon";
@@ -119,6 +118,19 @@ export default function ServicesPage() {
                             </span>
                             <span className="text-sm leading-relaxed text-zinc-300">
                               {bullet}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <h3 className="mt-8 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                        Typical outcomes
+                      </h3>
+                      <ul className="mt-5 space-y-3.5">
+                        {service.outcomes.map((outcome) => (
+                          <li key={outcome} className="flex items-start gap-3">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-fuchsia-300" />
+                            <span className="text-sm leading-relaxed text-zinc-300">
+                              {outcome}
                             </span>
                           </li>
                         ))}

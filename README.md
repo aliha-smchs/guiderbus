@@ -8,8 +8,10 @@ Marketing site for **Guiderbus** — a business automation agency that builds AI
 
 - [Next.js 15](https://nextjs.org) (App Router) + TypeScript
 - [Tailwind CSS v4](https://tailwindcss.com)
-- Static, fully responsive, dark-themed
-- Zero backend — deployable on [Vercel](https://vercel.com) as-is
+- Resend-backed contact and waitlist forms
+- Cloudflare Turnstile spam protection
+- Plausible privacy-friendly analytics
+- Docker/VPS production deployment with health checks
 
 ## Getting Started
 
@@ -21,7 +23,11 @@ npm run dev      # http://localhost:3000
 Build for production:
 
 ```bash
+npm run lint
+npm run typecheck
+npm run test
 npm run build
+npm run test:e2e
 npm start
 ```
 
@@ -30,6 +36,9 @@ npm start
 ```
 src/
 ├── app/                # routes: /, /services, /privacy, /terms
+│   ├── api/            # lead capture + health endpoints
+│   ├── contact/        # consultation form
+│   ├── platform/       # SaaS waitlist
 │   ├── icon.tsx        # generated favicon
 │   └── opengraph-image.tsx
 ├── components/
@@ -46,9 +55,48 @@ src/
 Site-wide settings (domain, contact email, navigation) live in [`src/lib/site.ts`](src/lib/site.ts).
 The service catalog lives in [`src/lib/services.ts`](src/lib/services.ts) and powers both the home cards and the `/services` page.
 
+## Production Services
+
+The website builds without secrets, but production lead capture needs these services:
+
+### Resend
+
+Create a Resend API key and verify the sending domain for `guiderbus.com`.
+Set:
+
+```bash
+RESEND_API_KEY=...
+LEAD_TO_EMAIL=contact@guiderbus.com
+LEAD_FROM_EMAIL="Guiderbus <contact@guiderbus.com>"
+```
+
+`LEAD_FROM_EMAIL` must use a sender address/domain approved in Resend.
+
+### Cloudflare Turnstile
+
+Create a Turnstile widget for `guiderbus.com`.
+Set:
+
+```bash
+TURNSTILE_SECRET_KEY=...
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=...
+```
+
+The server rejects production form submissions if `TURNSTILE_SECRET_KEY` is not configured.
+
+### Plausible
+
+Add `guiderbus.com` in Plausible and set:
+
+```bash
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=guiderbus.com
+```
+
+No Google Analytics or cookie banner is used for the current launch.
+
 ## Roadmap
 
-A self-serve SaaS platform is planned. The component architecture (`sections/` + `ui/`) is designed so a future `/platform` route can be added without rewrites. The site currently shows a "Coming Soon" placeholder for it.
+A self-serve SaaS platform is planned. The current `/platform` page collects waitlist interest through the same production lead pipeline as the consultation form.
 
 ## Deploy
 
@@ -90,6 +138,12 @@ APP_DOMAIN=guiderbus.com
 TRAEFIK_NETWORK=traefik-proxy
 TRAEFIK_ENTRYPOINT=websecure
 TRAEFIK_CERT_RESOLVER=letsencrypt
+RESEND_API_KEY=...
+LEAD_TO_EMAIL=contact@guiderbus.com
+LEAD_FROM_EMAIL="Guiderbus <contact@guiderbus.com>"
+TURNSTILE_SECRET_KEY=...
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=...
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=guiderbus.com
 ```
 
 `TRAEFIK_NETWORK` must match the Docker network used by your shared Traefik container.
@@ -99,9 +153,12 @@ TRAEFIK_CERT_RESOLVER=letsencrypt
 The workflow in `.github/workflows/ci-cd.yml` runs on pushes to `main`:
 
 1. Installs dependencies with `npm ci`
-2. Runs TypeScript checks with `npm run typecheck`
-3. Builds the Next.js app with `npm run build`
-4. SSHs into the VPS, pulls the latest `main`, and restarts the Docker Compose service
+2. Runs linting with `npm run lint`
+3. Runs TypeScript checks with `npm run typecheck`
+4. Runs unit/API tests with `npm run test`
+5. Builds the Next.js app with `npm run build`
+6. Installs Chromium for Playwright and runs `npm run test:e2e`
+7. SSHs into the VPS, pulls the latest `main`, and restarts the Docker Compose service
 
 Add these repository secrets in GitHub under **Settings > Secrets and variables > Actions**:
 

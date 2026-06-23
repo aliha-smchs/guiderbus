@@ -39,9 +39,10 @@ export default function TermsPage() {
           these Terms in the event of a conflict.
         </p>
         <p>
-          Any references to a future self-serve software platform are for
-          informational purposes only and do not constitute a commitment to
-          deliver that platform on any timeline.
+          Any references to a future self-serve software platform or early
+          access waitlist are for informational purposes only and do not
+          constitute a commitment to deliver that platform on any timeline or to
+          provide access to every waitlist registrant.
         </p>
       </LegalSection>
 
@@ -67,9 +68,10 @@ export default function TermsPage() {
 
       <LegalSection heading="5. Client Responsibilities and Acceptable Use">
         <p>
-          You agree to provide accurate information and the access necessary for
-          us to deliver the services, and to use any automation we build only for
-          lawful purposes. You agree not to use our services or any automation to:
+          You agree to provide accurate information through our website forms
+          and the access necessary for us to deliver the services, and to use
+          any automation we build only for lawful purposes. You agree not to use
+          our services or any automation to:
         </p>
         <ul>
           <li>

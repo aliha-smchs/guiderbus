@@ -1,10 +1,11 @@
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { GradientText } from "@/components/ui/GradientText";
+import { Button } from "@/components/ui/Button";
+import { site } from "@/lib/site";
 
 /**
- * Placeholder band for the future self-serve SaaS platform.
- * Intentionally non-interactive — no product exists yet.
+ * Early-access band for the future self-serve SaaS platform.
  */
 export function SaaSTeaser() {
   return (
@@ -29,10 +30,9 @@ export function SaaSTeaser() {
               </p>
             </div>
             <div className="shrink-0">
-              <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-zinc-400">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-fuchsia-400" />
-                In development
-              </span>
+              <Button href={site.platformHref} variant="secondary" size="lg">
+                Join the waitlist
+              </Button>
             </div>
           </div>
         </div>

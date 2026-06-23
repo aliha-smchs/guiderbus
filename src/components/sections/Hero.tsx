@@ -66,13 +66,12 @@ export function Hero() {
             <Button
               variant="secondary"
               size="lg"
-              disabled
-              aria-disabled
+              href={site.platformHref}
               className="w-full sm:w-auto"
             >
               SaaS Platform
               <Badge variant="soon" className="ml-1 px-2 py-0.5 text-[10px]">
-                Coming Soon
+                Waitlist
               </Badge>
             </Button>
           </div>

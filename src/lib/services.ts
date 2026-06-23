@@ -22,6 +22,8 @@ export interface Service {
   long: string[];
   /** Concrete capabilities / deliverables. */
   bullets: string[];
+  /** Business outcomes to make the service offer concrete. */
+  outcomes: string[];
 }
 
 export const services: Service[] = [
@@ -43,6 +45,11 @@ export const services: Service[] = [
       "Human-handoff to live agents when needed",
       "Template message design and approval handling",
     ],
+    outcomes: [
+      "Faster first response without hiring more support staff",
+      "Cleaner lead qualification before a human joins the conversation",
+      "Reliable customer updates that reduce missed appointments and follow-ups",
+    ],
   },
   {
     slug: "ai-chatbots-agents",
@@ -61,6 +68,11 @@ export const services: Service[] = [
       "Action-taking agents (bookings, lookups, ticketing)",
       "Tone and guardrails tuned to your brand",
       "Analytics on questions, gaps, and deflection rate",
+    ],
+    outcomes: [
+      "Consistent answers from your approved knowledge base",
+      "Fewer repetitive questions reaching your team",
+      "Clear escalation paths when the AI should hand off",
     ],
   },
   {
@@ -81,6 +93,11 @@ export const services: Service[] = [
       "Error handling, logging, and alerting",
       "No-code/low-code or fully custom implementations",
     ],
+    outcomes: [
+      "Less copy-paste work across sales, operations, and admin",
+      "Lower error rates in handoffs and data entry",
+      "Processes that keep moving even when the team is offline",
+    ],
   },
   {
     slug: "crm-integration",
@@ -100,6 +117,11 @@ export const services: Service[] = [
       "Lead capture and routing automations",
       "Reliable, monitored connections",
     ],
+    outcomes: [
+      "One source of truth across customer-facing systems",
+      "Leads and tickets routed to the right owner automatically",
+      "Fewer manual exports, imports, and stale records",
+    ],
   },
   {
     slug: "custom-ai-solutions",
@@ -118,6 +140,11 @@ export const services: Service[] = [
       "Classification, summarization & enrichment pipelines",
       "Rapid prototyping to production deployment",
       "Built around your data, privacy, and constraints",
+    ],
+    outcomes: [
+      "AI systems shaped around your workflow instead of generic templates",
+      "Practical prototypes that can become production tools",
+      "Clear privacy and data boundaries from the start",
     ],
   },
 ];

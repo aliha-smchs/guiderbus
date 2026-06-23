@@ -12,12 +12,14 @@ export const site = {
   email: "contact@guiderbus.com",
 
   // Primary call-to-action — books an agency consultation.
-  consultationHref: "mailto:contact@guiderbus.com?subject=Free%20Consultation%20Request",
+  consultationHref: "/contact",
+  platformHref: "/platform",
 
   nav: [
     { label: "Services", href: "/services" },
     { label: "How It Works", href: "/#how-it-works" },
     { label: "Why Guiderbus", href: "/#why-guiderbus" },
+    { label: "Platform", href: "/platform" },
   ],
 
   legal: [
@@ -26,7 +28,7 @@ export const site = {
   ],
 
   // Date shown on legal pages — keep in sync when policies are revised.
-  legalLastUpdated: "June 19, 2026",
+  legalLastUpdated: "June 23, 2026",
 } as const;
 
 export type Site = typeof site;

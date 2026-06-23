@@ -38,15 +38,17 @@ export default function PrivacyPage() {
         <p>We collect the following categories of information:</p>
         <p>
           <strong>Information you provide to us.</strong> When you contact us,
-          request a consultation, or engage our services, we may collect your
-          name, business name, email address, phone number, and the contents of
-          your messages.
+          request a consultation, join the platform waitlist, or engage our
+          services, we may collect your name, business name, email address,
+          phone number, service interests, budget or timeline preferences, and
+          the contents of your messages.
         </p>
         <p>
           <strong>Automatically collected information.</strong> When you visit
-          our website, we may collect technical data such as your IP address,
-          browser type, device information, pages viewed, and the date and time
-          of your visit, including through cookies and similar technologies.
+          our website, we may collect technical data such as your browser type,
+          device information, pages viewed, and the date and time of your visit.
+          We use privacy-friendly analytics to understand website usage in
+          aggregate.
         </p>
         <p>
           <strong>Messaging and WhatsApp data.</strong> When you interact with a
@@ -131,8 +133,16 @@ export default function PrivacyPage() {
             our website and run automations securely.
           </li>
           <li>
-            <strong>Analytics providers.</strong> Used to understand website
-            usage in aggregate.
+            <strong>Resend.</strong> Used to deliver consultation and waitlist
+            form submissions to our business inbox.
+          </li>
+          <li>
+            <strong>Cloudflare Turnstile.</strong> Used to protect forms from
+            spam and abuse.
+          </li>
+          <li>
+            <strong>Plausible Analytics.</strong> Used to understand website
+            usage in aggregate without Google Analytics.
           </li>
           <li>
             <strong>CRM and integration platforms.</strong> Used, where a client
@@ -212,11 +222,13 @@ export default function PrivacyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="12. Cookies">
+      <LegalSection heading="12. Cookies and Analytics">
         <p>
-          Our website may use cookies and similar technologies to operate the
-          site and understand usage. You can control cookies through your browser
-          settings. Disabling certain cookies may affect site functionality.
+          Our website may use necessary technologies to operate the site, protect
+          forms from abuse, and understand usage in aggregate. We do not use
+          Google Analytics for the current website launch. If optional analytics
+          or similar technologies are introduced later, we will update this
+          Policy as needed.
         </p>
       </LegalSection>
 

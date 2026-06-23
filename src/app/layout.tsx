@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
@@ -64,9 +65,19 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen font-sans antialiased">
+        {plausibleDomain && (
+          <Script
+            defer
+            data-domain={plausibleDomain}
+            src="https://plausible.io/js/script.js"
+            strategy="afterInteractive"
+          />
+        )}
         <Preloader />
         <ScrollProgress />
         <MotionProvider>
